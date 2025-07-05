@@ -1,289 +1,361 @@
-[![Build Status](https://travis-ci.com/coma123/Spring-Boot-Blog-REST-API.svg?branch=development)](https://travis-ci.com/coma123/Spring-Boot-Blog-REST-API) [![Sonarcloud Status](https://sonarcloud.io/api/project_badges/measure?project=coma123_Spring-Boot-Blog-REST-API&metric=alert_status)](https://sonarcloud.io/dashboard?id=coma123_Spring-Boot-Blog-REST-API) [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/3706/badge)](https://bestpractices.coreinfrastructure.org/projects/3706)
+# Employee Management REST API
 
-# Spring Boot, MySQL, Spring Security, JWT, JPA, Rest API
+A comprehensive Spring Boot REST API for managing employee data with layered architecture, supporting both development and production environments.
 
-Build Restful CRUD API for a blog using Spring Boot, Mysql, JPA and Hibernate.
+## 🚀 Features
 
-## Steps to Setup
+- **CRUD Operations**: Create, Read, Update, and Delete employee records
+- **Layered Architecture**: Clean separation of concerns with Controller, Service, Repository, and Entity layers
+- **DTO Pattern**: Data Transfer Objects for API communication
+- **Environment Configuration**: Support for development and production environments
+- **Database Integration**: MySQL database with JPA/Hibernate
+- **Model Mapping**: Automatic entity-DTO conversion using ModelMapper
 
-**1. Clone the application**
+## 🛠️ Technology Stack
 
-```bash
-git clone https://github.com/coma123/Spring-Boot-Blog-REST-API.git
+- **Java 23**
+- **Spring Boot 3.5.0**
+- **Spring Data JPA**
+- **MySQL Database**
+- **H2 Database** (for development)
+- **Lombok** (for reducing boilerplate code)
+- **ModelMapper** (for object mapping)
+- **Maven** (build tool)
+
+
+## 📋 Prerequisites
+
+Before running this application, make sure you have the following installed:
+
+- Java 23 or higher
+- Maven 3.6+
+- MySQL 8.0+
+
+
+## 🏗️ Project Architecture
+
+The project follows a layered architecture pattern:
+
+```
+Controller Layer (REST API) ←→ Service Layer (Business Logic) ←→ Repository Layer (Data Access) ←→ Database
 ```
 
-**2. Create Mysql database**
-```bash
-create database blogapi
+### Layer Responsibilities:
+
+1. **Controller Layer** (`EmployeeController`): Handles HTTP requests and responses
+2. **Service Layer** (`EmployeeService`): Contains business logic and orchestrates operations
+3. **Repository Layer** (`EmployeeRepo`): Manages data persistence and database operations
+4. **Entity Layer** (`EmployeeEntity`): Represents database tables
+5. **DTO Layer** (`EmployeeDTO`): Data Transfer Objects for API communication
+
+## 📁 Project Structure
+
 ```
-- run `src/main/resources/blogapi.sql`
+src/main/java/com/ApiCreation/Haardik/ApiCreation/
+├── ApiCreationApplication.java          # Main application class
+├── configuration/
+│   └── AppConfig.java                   # Configuration beans
+├── controllers/
+│   └── EmployeeController.java          # REST API endpoints
+├── dto/
+│   └── EmployeeDTO.java                 # Data Transfer Object
+├── entities/
+│   └── EmployeeEntity.java              # JPA Entity
+├── Repositories/
+│   └── EmployeeRepo.java                # Data access layer
+├── services/
+│   └── EmployeeService.java             # Business logic layer
+├── DB.java                              # Database interface
+├── DevDB.java                           # Development database implementation
+└── ProdDB.java                          # Production database implementation
+```
 
-**3. Change mysql username and password as per your installation**
+## ⚙️ Configuration
 
-+ open `src/main/resources/application.properties`
-+ change `spring.datasource.username` and `spring.datasource.password` as per your mysql installation
+### Application Properties
 
-**4. Run the app using maven**
+The application supports different environments through configuration:
 
+```properties
+# Application name
+spring.application.name=ApiCreation
+
+# Environment mode (development/production)
+project.mode=production
+
+# Database configuration
+spring.datasource.url=jdbc:mysql://localhost:3306/newdb
+spring.datasource.username=root
+spring.datasource.password=Haar4110@
+
+# JPA/Hibernate configuration
+spring.jpa.show-sql=true
+spring.jpa.generate.ddl=true
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
+
+# H2 Console (for development)
+spring.h2.console.enabled=true
+```
+
+### Environment-Specific Beans
+
+The application uses conditional beans based on the `project.mode` property:
+
+- **Development Mode**: Uses `DevDB` implementation
+- **Production Mode**: Uses `ProdDB` implementation
+
+## 🚀 Getting Started
+
+### 1. Clone the Repository
+
+```bash
+git clone <repository-url>
+cd ApiCreation
+```
+
+### 2. Database Setup
+
+#### MySQL Setup
+1. Create a MySQL database named `newdb`
+2. Update database credentials in `application.properties` if needed
+
+#### H2 Database (Development)
+- H2 console is enabled and accessible at: `http://localhost:8080/h2-console`
+- JDBC URL: `jdbc:h2:mem:testdb`
+- Username: `sa`
+- Password: (leave empty)
+
+### 3. Build the Project
+
+```bash
+mvn clean install
+```
+
+### 4. Run the Application
+
+#### Using Maven
 ```bash
 mvn spring-boot:run
 ```
-The app will start running at <http://localhost:8080>
 
-## Explore Rest APIs
+#### Using JAR
+```bash
+java -jar target/ApiCreation-0.0.1-SNAPSHOT.jar
+```
 
-The app defines following CRUD APIs.
 
-### Auth
 
-| Method | Url | Decription | Sample Valid Request Body | 
-| ------ | --- | ---------- | --------------------------- |
-| POST   | /api/auth/signup | Sign up | [JSON](#signup) |
-| POST   | /api/auth/signin | Log in | [JSON](#signin) |
+The application will start on `http://localhost:8080`
 
-### Users
+## 📚 API Documentation
 
-| Method | Url | Description | Sample Valid Request Body |
-| ------ | --- | ----------- | ------------------------- |
-| GET    | /api/users/me | Get logged in user profile | |
-| GET    | /api/users/{username}/profile | Get user profile by username | |
-| GET    | /api/users/{username}/posts | Get posts created by user | |
-| GET    | /api/users/{username}/albums | Get albums created by user | |
-| GET    | /api/users/checkUsernameAvailability | Check if username is available to register | |
-| GET    | /api/users/checkEmailAvailability | Check if email is available to register | |
-| POST   | /api/users | Add user (Only for admins) | [JSON](#usercreate) |
-| PUT    | /api/users/{username} | Update user (If profile belongs to logged in user or logged in user is admin) | [JSON](#userupdate) |
-| DELETE | /api/users/{username} | Delete user (For logged in user or admin) | |
-| PUT    | /api/users/{username}/giveAdmin | Give admin role to user (only for admins) | |
-| PUT    | /api/users/{username}/TakeAdmin | Take admin role from user (only for admins) | |
-| PUT    | /api/users/setOrUpdateInfo | Update user profile (If profile belongs to logged in user or logged in user is admin) | [JSON](#userinfoupdate) |
+### Base URL
+```
+http://localhost:8080/employees
+```
 
-### Posts
+### API Endpoints
 
-| Method | Url | Description | Sample Valid Request Body |
-| ------ | --- | ----------- | ------------------------- |
-| GET    | /api/posts | Get all posts | |
-| GET    | /api/posts/{id} | Get post by id | |
-| POST   | /api/posts | Create new post (By logged in user) | [JSON](#postcreate) |
-| PUT    | /api/posts/{id} | Update post (If post belongs to logged in user or logged in user is admin) | [JSON](#postupdate) |
-| DELETE | /api/posts/{id} | Delete post (If post belongs to logged in user or logged in user is admin) | |
+| Method | URL | Description | Sample Valid Request Body |
+|--------|-----|-------------|---------------------------|
+| GET | `/employees` | Get all employees | - |
+| GET | `/employees/{id}` | Get employee by ID | - |
+| POST | `/employees` | Create new employee | [JSON](#employeecreate) |
+| DELETE | `/employees/{id}` | Delete employee by ID | - |
+| GET | `/employees/data` | Get data with query parameters | - |
 
-### Comments
+### Detailed Endpoint Documentation
 
-| Method | Url | Description | Sample Valid Request Body |
-| ------ | --- | ----------- | ------------------------- |
-| GET    | /api/posts/{postId}/comments | Get all comments which belongs to post with id = postId | |
-| GET    | /api/posts/{postId}/comments/{id} | Get comment by id if it belongs to post with id = postId | |
-| POST   | /api/posts/{postId}/comments | Create new comment for post with id = postId (By logged in user) | [JSON](#commentcreate) |
-| PUT    | /api/posts/{postId}/comments/{id} | Update comment by id if it belongs to post with id = postId (If comment belongs to logged in user or logged in user is admin) | [JSON](#commentupdate) |
-| DELETE | /api/posts/{postId}/comments/{id} | Delete comment by id if it belongs to post with id = postId (If comment belongs to logged in user or logged in user is admin) | |
+#### 1. Get All Employees
+```http
+GET /employees
+```
 
-### Albums
+**Response:**
+```json
+[
+  {
+    "id": 1,
+    "name": "John Doe",
+    "date": "2023-01-15",
+    "is_active": true
+  }
+]
+```
 
-| Method | Url | Description | Sample Valid Request Body |
-| ------ | --- | ----------- | ------------------------- |
-| GET    | /api/albums | Get all albums | |
-| GET    | /api/albums/{id} | Get album by id | |
-| POST   | /api/albums | Create new album (By logged in user) | [JSON](#albumcreate) |
-| PUT    | /api/albums/{id} | Update album (If album belongs to logged in user or logged in user is admin) | [JSON](#albumupdate) |
-| DELETE | /api/albums/{id} | Delete album (If album belongs to logged in user or logged in user is admin) | |
-| GET    | /api/albums/{id}/photos | Get all photos which belongs to album with id = id | |
+#### 2. Get Employee by ID
+```http
+GET /employees/{id}
+```
 
-### Photos
+**Parameters:**
+- `id` (path): Employee ID
 
-| Method | Url | Description | Sample Valid Request Body |
-| ------ | --- | ----------- | ------------------------- |
-| GET    | /api/photos | Get all photos | |
-| GET    | /api/photos/{id} | Get photo by id | |
-| POST   | /api/photos | Create new photo (By logged in user) | [JSON](#photocreate) |
-| PUT    | /api/photos/{id} | Update photo (If photo belongs to logged in user or logged in user is admin) | [JSON](#photoupdate) |
-| DELETE | /api/photos/{id} | Delete photo (If photo belongs to logged in user or logged in user is admin) | |
-
-### Todos
-
-| Method | Url | Description | Sample Valid Request Body |
-| ------ | --- | ----------- | ------------------------- |
-| GET    | /api/todos | Get all todos which belongs to logged in user | |
-| GET    | /api/todos/{id} | Get todo by id (If todo belongs to logged in user) | |
-| POST   | /api/todos | Create new todo (By logged in user) | [JSON](#todocreate) |
-| PUT    | /api/todos/{id} | Update todo (If todo belongs to logged in user) | [JSON](#todoupdate) |
-| DELETE | /api/todos/{id} | Delete todo (If todo belongs to logged in user) | |
-| PUT    | /api/todos/{id}/complete | Mark todo as complete (If todo belongs to logged in user) | |
-| PUT    | /api/todos/{id}/unComplete | Mark todo as uncomplete (If todo belongs to logged in user) | |
-
-Test them using postman or any other rest client.
-
-## Sample Valid JSON Request Bodys
-
-##### <a id="signup">Sign Up -> /api/auth/signup</a>
+**Response:**
 ```json
 {
-	"firstName": "Leanne",
-	"lastName": "Graham",
-	"username": "leanne",
-	"password": "password",
-	"email": "leanne.graham@gmail.com"
+  "id": 1,
+  "name": "John Doe",
+  "date": "2023-01-15",
+  "is_active": true
 }
 ```
 
-##### <a id="signin">Log In -> /api/auth/signin</a>
+#### 3. Create New Employee
+```http
+POST /employees
+```
+
+**Request Body:**
 ```json
 {
-	"usernameOrEmail": "leanne",
-	"password": "password"
+  "name": "Jane Smith",
+  "date": "2023-02-20",
+  "is_active": true
 }
 ```
 
-##### <a id="usercreate">Create User -> /api/users</a>
+**Response:**
 ```json
 {
-	"firstName": "Ervin",
-	"lastName": "Howell",
-	"username": "ervin",
-	"password": "password",
-	"email": "ervin.howell@gmail.com",
-	"address": {
-		"street": "Victor Plains",
-		"suite": "Suite 879",
-		"city": "Wisokyburgh",
-		"zipcode": "90566-7771",
-		"geo": {
-			"lat": "-43.9509",
-			"lng": "-34.4618"
-		}
-	},
-	"phone": "010-692-6593 x09125",
-	"website": "http://erwinhowell.com",
-	"company": {
-		"name": "Deckow-Crist",
-		"catchPhrase": "Proactive didactic contingency",
-		"bs": "synergize scalable supply-chains"
-	}
+  "id": 2,
+  "name": "Jane Smith",
+  "date": "2023-02-20",
+  "is_active": true
 }
 ```
 
-##### <a id="userupdate">Update User -> /api/users/{username}</a>
+#### 4. Delete Employee
+```http
+DELETE /employees/{id}
+```
+
+**Parameters:**
+- `id` (path): Employee ID
+
+**Response:**
+```json
+true
+```
+
+#### 5. Get Data with Query Parameters
+```http
+GET /employees/data?sortBy=age&limit=4
+```
+
+**Query Parameters:**
+- `sortBy`: Field to sort by
+- `limit`: Number of records to return
+
+**Response:**
+```
+Hello World age4
+```
+
+## Sample Valid JSON Request Bodies
+
+##### <a id="employeecreate">Create Employee -> /api/employees</a>
 ```json
 {
-	"firstName": "Ervin",
-	"lastName": "Howell",
-	"username": "ervin",
-	"password": "updatedpassword",
-	"email": "ervin.howell@gmail.com",
-	"address": {
-		"street": "Victor Plains",
-		"suite": "Suite 879",
-		"city": "Wisokyburgh",
-		"zipcode": "90566-7771",
-		"geo": {
-			"lat": "-43.9509",
-			"lng": "-34.4618"
-		}
-	},
-	"phone": "010-692-6593 x09125",
-	"website": "http://erwinhowell.com",
-	"company": {
-		"name": "Deckow-Crist",
-		"catchPhrase": "Proactive didactic contingency",
-		"bs": "synergize scalable supply-chains"
-	}
+    "name": "Andrew Johnson",
+    "date": "2023-02-12",
+    "is_active": true
 }
 ```
 
-##### <a id="userinfoupdate">Update User Profile -> /api/users/setOrUpdateInfo</a>
+##### <a id="employeeupdate">Update Employee -> /api/employees/{id}</a>
 ```json
 {
-	"street": "Douglas Extension",
-	"suite": "Suite 847",
-	"city": "McKenziehaven",
-	"zipcode": "59590-4157",
-	"companyName": "Romaguera-Jacobson",
-	"catchPhrase": "Face to face bifurcated interface",
-	"bs": "e-enable strategic applications",
-	"website": "http://ramiro.info",
-	"phone": "1-463-123-4447",
-	"lat": "-68.6102",
-	"lng": "-47.0653"
+    "name": "Andrew Johnson Updated",
+    "date": "2023-03-15",
+    "is_active": false
 }
 ```
 
-##### <a id="postcreate">Create Post -> /api/posts</a>
-```json
+## 🔧 Data Models
+
+### EmployeeDTO
+```java
 {
-	"title": "sunt aut facere repellat provident occaecati excepturi optio reprehenderit",
-	"body": "quia et suscipit suscipit recusandae consequuntur expedita et cum reprehenderit molestiae ut ut quas totam nostrum rerum est autem sunt rem eveniet architecto"
+  "id": Long,           // Employee ID (auto-generated)
+  "name": String,       // Employee name
+  "date": LocalDate,    // Joining date
+  "is_active": boolean  // Active status
 }
 ```
 
-##### <a id="postupdate">Update Post -> /api/posts/{id}</a>
-```json
+### EmployeeEntity
+```java
 {
-	"title": "UPDATED UPDATED UPDATED UPDATED UPDATED UPDATED",
-	"body": "UPDATED UPDATED UPDATED UPDATED UPDATED UPDATED UPDATED UPDATED UPDATED UPDATED UPDATED UPDATED "
+  "id": Long,           // Primary key
+  "name": String,       // Employee name
+  "joining_date": LocalDate,  // Joining date
+  "is_active": boolean  // Active status
 }
 ```
 
-##### <a id="commentcreate">Create Comment -> /api/posts/{postId}/comments</a>
-```json
-{
-	"body": "laudantium enim quasi est quidem magnam voluptate ipsam eos tempora quo necessitatibus dolor quam autem quasi reiciendis et nam sapiente accusantium"
-}
+## 🧪 Testing
+
+### Run Tests
+```bash
+mvn test
 ```
 
-##### <a id="commentupdate">Update Comment -> /api/posts/{postId}/comments/{id}</a>
-```json
-{
-	"body": "UPDATED UPDATED UPDATED UPDATED UPDATED UPDATED UPDATED UPDATED UPDATED UPDATED "
-}
-```
+### Test Coverage
+The project includes unit tests for the main application class.
 
-##### <a id="albumcreate">Create Album -> /api/albums</a>
-```json
-{
-	"title": "quidem molestiae enim"
-}
-```
 
-##### <a id="albumupdate">Update Album -> /api/albums/{id}</a>
-```json
-{
-	"title": "quidem molestiae enim UPDATED"
-}
-```
 
-##### <a id="photocreate">Create Photo -> /api/photos</a>
-```json
-{
-	"title": "accusamus beatae ad facilis cum similique qui sunt",
-	"url": "https://via.placeholder.com/600/92c952",
-	"thumbnailUrl": "https://via.placeholder.com/150/92c952",
-	"albumId": 2
-}
-```
+## 🔍 Key Features Explained
 
-##### <a id="photoupdate">Update Photo -> /api/photos{id}</a>
-```json
-{
-	"title": "accusamus beatae ad facilis ",
-	"url": "https://via.placeholder.com/600/771796",
-	"thumbnailUrl": "https://via.placeholder.com/150/771796",
-	"albumId": 4
-}
-```
+### 1. Layered Architecture
+- **Separation of Concerns**: Each layer has a specific responsibility
+- **Maintainability**: Easy to modify and extend functionality
+- **Testability**: Each layer can be tested independently
 
-##### <a id="todocreate">Create Todo -> /api/todos</a>
-```json
-{
-	"title": "delectus aut autem",
-	"completed": false
-}
-```
+### 2. DTO Pattern
+- **Data Transfer**: Clean data transfer between layers
+- **API Contract**: Stable API interface
+- **Security**: Control over what data is exposed
 
-##### <a id="todoupdate">Update Todo -> /api/todos{id}</a>
-```json
-{
-	"title": "delectus aut autem Updated",
-	"completed": true
-}
-```
-![segment](https://api.segment.io/v1/pixel/track?data=ewogICJ3cml0ZUtleSI6ICJwcDJuOTU4VU1NT21NR090MWJXS0JQd0tFNkcydW51OCIsCiAgInVzZXJJZCI6ICIxMjNibG9nYXBpMTIzIiwKICAiZXZlbnQiOiAiQmxvZ0FwaSB2aXNpdGVkIiwKICAicHJvcGVydGllcyI6IHsKICAgICJzdWJqZWN0IjogIkJsb2dBcGkgdmlzaXRlZCIsCiAgICAiZW1haWwiOiAiY29tcy5zcHVyc0BnbWFpbC5jb20iCiAgfQp9)
+### 3. ModelMapper Integration
+- **Automatic Mapping**: Converts between Entity and DTO objects
+- **Reduced Boilerplate**: Eliminates manual mapping code
+- **Type Safety**: Maintains type safety during conversions
+
+### 4. Environment Configuration
+- **Conditional Beans**: Different implementations for different environments
+- **Property-Based**: Easy environment switching
+- **Flexible**: Easy to add new environments
+
+## 🚨 Error Handling
+
+The API includes basic error handling:
+- **404 Not Found**: When employee ID doesn't exist
+- **400 Bad Request**: For invalid request data
+- **500 Internal Server Error**: For server-side errors
+
+## 📝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests for new functionality
+5. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+## 👨‍💻 Author
+
+**Haardik** - *Initial work*
+
+## 🤝 Support
+
+For support and questions, please open an issue in the repository.
+
+---
+
+**Note**: This is a demo project for Spring Boot showcasing best practices in REST API development with layered architecture and proper separation of concerns. 
